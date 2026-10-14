@@ -86,7 +86,7 @@ impl PanelState {
                 if segmented(ui, $key, $label, rect, &mut $field, opts) {
                     changed = true;
                 }
-                y += 36.0;
+                y += 42.0;
             }};
         }
         let auto: &[(&str, &str)] = &[("auto", "Auto"), ("on", "On"), ("off", "Off")];
@@ -127,10 +127,12 @@ impl PanelState {
             let sw = Rect::new(x + w - 44.0, rect.y + (h - 26.0) / 2.0, 44.0, 26.0);
             let k = ui.st.widget(id_n(key, 1)).knob.to(if *value { 1.0 } else { 0.0 }, ui.dt, ui.th.reduce_motion, &mut ui.animating);
             let off = if ui.th.light { [0.0, 0.0, 0.0, 0.14] } else { [1.0, 1.0, 1.0, 0.18] };
+            ui.r.push(sw.center(), 1.0 + 0.08 * r.hover, (0.0, 0.0), 1.0);
             ui.r.rrect(sw, 13.0, crate::gfx::geom::mix_color(off, ui.th.accent, k));
             ui.r.circle((sw.x + 13.0 + k * 18.0, sw.y + 13.0), 11.0, [1.0, 1.0, 1.0, 1.0]);
+            ui.r.pop();
             ui.focus_ring(id(key), sw, 13.0, -2.0);
-            *y += h + 2.0;
+            *y += h + 8.0;
         };
         // glass transparency slider
         {
@@ -145,7 +147,7 @@ impl PanelState {
             if r.committed.is_some() {
                 acts.push(PanelAction::Changed);
             }
-            y += 42.0;
+            y += 46.0;
         }
         toggle(ui, "background_extension", "Background Extension", "Fill letterbox bars with the video's edge light", &mut s.background_extension, &mut y, &mut acts);
         toggle(ui, "hwdec", "Hardware Decoding", "", &mut s.hwdec, &mut y, &mut acts);
@@ -177,10 +179,12 @@ impl PanelState {
                 s.accent = hex.to_string();
                 changed = true;
             }
+            ui.r.push(rect.center(), 1.0 + 0.18 * r.hover, (0.0, 0.0), 1.0);
             ui.r.circle(rect.center(), 11.0, parse_color(hex));
             if s.accent.eq_ignore_ascii_case(hex) {
                 ui.r.rrect_stroke(rect.inset(-1.0), 12.0, 2.0, text);
             }
+            ui.r.pop();
             ui.focus_ring(wid, rect, 11.0, -3.0);
             sx += 22.0 + gap;
         }
@@ -271,7 +275,9 @@ impl PanelState {
 fn segmented(ui: &mut Ui, key: &'static str, label: &str, rect: Rect, value: &mut String, options: &[(&str, &str)]) -> bool {
     let wid = id(key);
     let label = tr(label);
-    let seg_w = options.iter().map(|o| ui.r.text_width(tr(o.1), 12.0, Weight::DemiBold) + 18.0).fold(58.0, f32::max);
+    let fit = options.iter().map(|o| ui.r.text_width(tr(o.1), 12.0, Weight::DemiBold) + 18.0).fold(58.0, f32::max);
+    let room = (rect.w - ui.r.text_width(label, 13.0, Weight::Medium) - 20.0) / options.len() as f32;
+    let seg_w = fit.min(room);
     let track = Rect::new(rect.right() - seg_w * options.len() as f32, rect.y + 3.0, seg_w * options.len() as f32, 28.0);
     let r = ui.interact(wid, track, Interact { press_scale: 1.0, keys: false, ..Interact::default() });
     let index = options.iter().position(|o| o.0 == value).unwrap_or(0);
@@ -300,6 +306,7 @@ fn segmented(ui: &mut Ui, key: &'static str, label: &str, rect: Rect, value: &mu
     let index = options.iter().position(|o| o.0 == value).unwrap_or(0);
     let lh = ui.r.line_height(13.0);
     ui.r.text(label, rect.x, rect.y + (rect.h - lh) / 2.0, 13.0, Weight::Medium, ui.th.c.text_primary.0);
+    ui.r.push(track.center(), 1.0 + 0.03 * r.hover, (0.0, 0.0), 1.0);
     ui.r.rrect(track, 14.0, if ui.th.light { [0.0, 0.0, 0.0, 0.07] } else { [1.0, 1.0, 1.0, 0.10] });
     let knob = ui.st.widget(id_n(key, 7)).knob.to(index as f32 * seg_w, ui.dt, ui.th.reduce_motion, &mut ui.animating);
     ui.r.rrect(Rect::new(track.x + knob + 2.0, track.y + 2.0, seg_w - 4.0, 24.0), 12.0, if ui.th.light { [1.0, 1.0, 1.0, 1.0] } else { [1.0, 1.0, 1.0, 0.22] });
@@ -309,6 +316,7 @@ fn segmented(ui: &mut Ui, key: &'static str, label: &str, rect: Rect, value: &mu
         let c = if i == index { ui.th.c.text_primary.0 } else { ui.th.c.text_secondary.0 };
         ui.r.text(tr(o.1), track.x + i as f32 * seg_w + (seg_w - tw) / 2.0, track.y + (track.h - l12) / 2.0, 12.0, Weight::DemiBold, c);
     }
+    ui.r.pop();
     ui.focus_ring(wid, track, 14.0, -2.0);
     changed
 }

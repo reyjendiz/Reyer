@@ -1,6 +1,6 @@
 [package]
 name = "reyer"
-version = "2.1.0"
+version = "2.1.1"
 edition = "2021"
 description = "Video and audio player for Windows with a Liquid Glass interface"
 license = "GPL-3.0-or-later"

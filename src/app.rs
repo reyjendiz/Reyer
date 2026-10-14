@@ -501,9 +501,7 @@ impl App {
             || self.player.paused()
             || self.popover.is_open()
             || self.dock_state.busy
-            || self.chrome_state.hovered
-            || self.ui_state.nav
-            || (self.ui_state.nav && self.ui_state.focus != 0); // a clicked button keeps focus but must not pin the chrome
+            || self.chrome_state.hovered; // keys count as activity, so keyboard use never pins the controls
 
         let auto_hide_dur = Duration::from_millis(tokens().timings.auto_hide as u64);
         let chrome_target = if hold_chrome || now.duration_since(self.last_activity) < auto_hide_dur {

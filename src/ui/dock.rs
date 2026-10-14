@@ -207,10 +207,11 @@ impl DockState {
         let x_speed = x_seek + seek_w + gap;
         let x_tools = x_speed + speed_w + gap;
         let ox = (inp.window.0 - width) / 2.0;
-        let oy = inp.window.1 - height - t.sizes.dock_bottom_margin + (1.0 - inp.chrome_t) * 8.0 + (1.0 - inp.rise) * 12.0;
+        let oy = inp.window.1 - height - t.sizes.dock_bottom_margin + (1.0 - inp.chrome_t) * 14.0 + (1.0 - inp.rise) * 12.0;
         let dock = Rect::new(ox, oy, width, height);
         self.rect = dock;
-        ui.r.push((ox + width / 2.0, oy + height), breathe, (0.0, 0.0), 1.0);
+        // the dock fades with the rest of the chrome (it used to only slide 8 px and stay visible)
+        ui.r.push((ox + width / 2.0, oy + height), breathe, (0.0, 0.0), inp.chrome_t.clamp(0.0, 1.0));
 
         // hover and focus per group, for the glass glow
         let groups = [

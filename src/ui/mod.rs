@@ -295,7 +295,7 @@ impl<'a> Ui<'a> {
                 self.st.tip.shown_id = 0;
             } else if self.st.tip.pending.as_ref().map(|p| p.0) != Some(id) && self.st.tip.shown_id != id {
                 let anchor = self.r.transformed(rect);
-                self.st.tip.pending = Some((id, o.label.to_string(), anchor, self.now));
+                self.st.tip.pending = Some((id, crate::i18n::tr(o.label).to_string(), anchor, self.now));
             }
         }
         let show_ring_hover = hovered || (resp.focused && self.st.nav);

@@ -361,7 +361,7 @@ impl Player {
         if !path.is_empty() && Path::new(&path).is_file() && looks_protected(Path::new(&path)) {
             self.toasts.push_back(format!("“{name}” is copy-protected (iTunes DRM) and can’t be played"));
         } else {
-            self.toasts.push_back(format!("Can’t play “{name}”"));
+            self.toasts.push_back(crate::i18n::tr1("Can’t play “{}”", &name));
         }
     }
 
@@ -574,7 +574,7 @@ impl Player {
         if ok {
             self.set("pause", "no");
         } else {
-            self.toasts.push_back(format!("Can’t open “{name}”"));
+            self.toasts.push_back(crate::i18n::tr1("Can’t open “{}”", &name));
         }
     }
 

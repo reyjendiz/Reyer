@@ -118,6 +118,9 @@ pub struct App {
     theme: Theme,
     player: Player,
     art_gen: ArtGenerator,
+    updater: crate::update::Updater,
+    /// The update state the user was last told about (one toast per change).
+    update_shown: crate::update::State,
     display: *mut c_void,
     get_proc: extern "C" fn(*mut c_void, *const c_char) -> *mut c_void,
 
@@ -179,8 +182,10 @@ impl App {
         let settings_path = data_dir().join("settings.json");
         let settings = Settings::load(&settings_path);
         let sys_prefs = SystemPrefs::read();
+        crate::i18n::set(&settings.language);
         let theme = Theme::new(&settings, &sys_prefs, [-0.55, -0.83]);
         let player = Player::new(&settings, proxy.clone());
+        let updater = crate::update::Updater::new(proxy.clone());
         let art_gen = ArtGenerator::new(proxy);
 
         App {
@@ -192,6 +197,8 @@ impl App {
             theme,
             player,
             art_gen,
+            updater,
+            update_shown: crate::update::State::Idle,
             display,
             get_proc,
 
@@ -256,6 +263,9 @@ impl App {
         }
         self.started = true;
         let _ = self.player.start(&self.settings, self.display, self.get_proc);
+        if self.settings.check_updates {
+            self.updater.check();
+        }
         if !self.cli.files.is_empty() {
             self.player.open_paths(&self.cli.files, &mut self.settings);
         }
@@ -362,7 +372,7 @@ impl App {
             dialog = dialog.set_directory(&self.settings.last_folder);
         }
         if subtitles {
-            dialog = dialog.add_filter("Subtitles", &["srt", "ass", "ssa", "vtt", "sub"]);
+            dialog = dialog.add_filter(crate::i18n::tr("Subtitles"), &["srt", "ass", "ssa", "vtt", "sub"]);
             if let Some(path) = dialog.pick_file() {
                 self.player.add_subtitle(&path.to_string_lossy());
                 self.toast_state.show("Added subtitle file", Instant::now());
@@ -371,7 +381,7 @@ impl App {
             let mut exts = Vec::new();
             exts.extend_from_slice(VIDEO_EXTS);
             exts.extend_from_slice(AUDIO_EXTS);
-            dialog = dialog.add_filter("Media Files", &exts);
+            dialog = dialog.add_filter(crate::i18n::tr("Media Files"), &exts);
             if let Some(paths) = dialog.pick_files() {
                 let list: Vec<String> = paths.into_iter().map(|p| p.to_string_lossy().into_owned()).collect();
                 self.player.open_paths(&list, &mut self.settings);
@@ -409,8 +419,8 @@ impl App {
             if now >= at {
                 self.track_toast = None;
                 let list = if kind == "audio" { self.player.audio_tracks() } else { self.player.subtitle_tracks() };
-                let sel = list.into_iter().find(|t| t.selected).map(|t| t.label).unwrap_or_else(|| "Off".into());
-                self.toast_state.show(&format!("{}: {sel}", if kind == "audio" { "Audio" } else { "Subtitles" }), now);
+                let sel = list.into_iter().find(|t| t.selected).map(|t| t.label).unwrap_or_else(|| crate::i18n::tr("Off").into());
+                self.toast_state.show(&format!("{}: {sel}", crate::i18n::tr(if kind == "audio" { "Audio" } else { "Subtitles" })), now);
             }
         }
 
@@ -500,6 +510,26 @@ impl App {
         }
 
         self.theme.glass_opacity = self.settings.glass_opacity; // live while the slider moves
+
+        // updates: a toast once per new state; the installer needs Reyer closed
+        let ust = self.updater.state();
+        if ust != self.update_shown {
+            use crate::update::State as U;
+            match &ust {
+                U::Available { version, .. } => self.toast_state.show(&crate::i18n::tr1("Version {} is available", version), now),
+                U::Failed(e) => self.toast_state.show(&crate::i18n::tr1("Update failed: {}", e), now),
+                U::Launched => {
+                    self.request_close();
+                }
+                _ => {}
+            }
+            self.update_shown = ust.clone();
+        }
+        let update = match ust {
+            crate::update::State::Available { version, .. } => Some((version, false)),
+            crate::update::State::Downloading { version } => Some((version, true)),
+            _ => None,
+        };
 
         // Auto-hide chrome logic
         // a pointer resting on the controls doesn't hold them: they hide once it stops moving
@@ -775,7 +805,7 @@ impl App {
             if input.wheel != 0.0 && !ui.over_chrome && !self.popover.is_open() {
                 let v = self.player.nudge_volume(if input.wheel > 0.0 { 5.0 } else { -5.0 });
                 self.dock_state.poke_volume(false, now);
-                self.toast_state.show(&format!("Volume {}%", v.round() as i32), now);
+                self.toast_state.show(&crate::i18n::tr1("Volume {}", &format!("{}%", v.round() as i32)), now);
             }
 
             ui.blocked = false;
@@ -795,9 +825,9 @@ impl App {
                     }
                     "subtitles" => {
                         let any_sel = subtitle_tracks.iter().any(|t| t.selected);
-                        let mut items = vec![MenuItem { label: "Off".into(), checked: !any_sel }];
+                        let mut items = vec![MenuItem { label: crate::i18n::tr("Off").into(), checked: !any_sel }];
                         items.extend(subtitle_tracks.iter().map(|t| MenuItem { label: t.label.clone(), checked: t.selected }));
-                        items.push(MenuItem { label: "Add Subtitle File…".into(), checked: false });
+                        items.push(MenuItem { label: crate::i18n::tr("Add Subtitle File…").into(), checked: false });
                         let mut chosen = None;
                         self.popover.draw(&mut ui, |ui, cur, body, prog| {
                             chosen = menu(ui, cur, body, prog, "Subtitles", &items);
@@ -827,7 +857,7 @@ impl App {
                     }
                     "settings" => {
                         self.popover.draw(&mut ui, |ui, _cur, body, _prog| {
-                            events.pop_panel_acts = self.panel_state.settings(ui, body, &mut self.settings, has_media);
+                            events.pop_panel_acts = self.panel_state.settings(ui, body, &mut self.settings, has_media, update.as_ref().map(|(v, b)| (v.as_str(), *b)));
                         });
                     }
                     "info" => {
@@ -945,16 +975,16 @@ impl App {
         if let Some(idx) = events.pop_chosen_audio {
             if let Some(t) = audio_tracks.get(idx) {
                 self.player.select_track("audio", t.id);
-                self.toast_state.show(&format!("Audio: {}", t.label), now);
+                self.toast_state.show(&format!("{}: {}", crate::i18n::tr("Audio"), t.label), now);
             }
         }
         if let Some(idx) = events.pop_chosen_sub {
             if idx == 0 {
                 self.player.select_track("subtitles", 0);
-                self.toast_state.show("Subtitles: Off", now);
+                self.toast_state.show(&format!("{}: {}", crate::i18n::tr("Subtitles"), crate::i18n::tr("Off")), now);
             } else if let Some(t) = subtitle_tracks.get(idx - 1) {
                 self.player.select_track("subtitles", t.id);
-                self.toast_state.show(&format!("Subtitles: {}", t.label), now);
+                self.toast_state.show(&format!("{}: {}", crate::i18n::tr("Subtitles"), t.label), now);
             }
         }
         if events.pop_open_dialog_sub {
@@ -991,7 +1021,9 @@ impl App {
         for act in events.pop_panel_acts {
             match act {
                 PanelAction::Applied(k, v) => self.player.apply_setting(k, v),
+                PanelAction::UpdateRequested => self.updater.install(),
                 PanelAction::Changed => {
+                    crate::i18n::set(&self.settings.language);
                     self.theme = Theme::new(&self.settings, &self.sys_prefs, self.theme.light_dir);
                     let _ = self.settings.save(&self.settings_path);
                 }
@@ -1022,12 +1054,12 @@ impl App {
                 K::Up => {
                     let v = self.player.nudge_volume(5.0);
                     self.dock_state.poke_volume(false, now);
-                    self.toast_state.show(&format!("Volume {}%", v.round() as i32), now);
+                    self.toast_state.show(&crate::i18n::tr1("Volume {}", &format!("{}%", v.round() as i32)), now);
                 }
                 K::Down => {
                     let v = self.player.nudge_volume(-5.0);
                     self.dock_state.poke_volume(false, now);
-                    self.toast_state.show(&format!("Volume {}%", v.round() as i32), now);
+                    self.toast_state.show(&crate::i18n::tr1("Volume {}", &format!("{}%", v.round() as i32)), now);
                 }
                 K::Escape => {
                     if self.popover.is_open() {

@@ -1,5 +1,6 @@
 //! Popover contents: the settings panel and the file-information panel. Both scroll when they
 //! don't fit; every control is keyboard reachable (Tab, arrows, Space/Enter).
+use crate::i18n::tr;
 use super::{id, id_n, Interact, Ui};
 use crate::gfx::{Rect, Weight};
 use crate::input::K;
@@ -16,6 +17,7 @@ pub enum PanelAction {
     /// A setting that the theme or dock reads changed.
     Changed,
     InfoRequested,
+    UpdateRequested,
     Copy(String),
 }
 
@@ -44,7 +46,8 @@ impl PanelState {
     }
 
     // ---- settings ------------------------------------------------------------------------------------
-    pub fn settings(&mut self, ui: &mut Ui, body: Rect, s: &mut Settings, has_media: bool) -> Vec<PanelAction> {
+    /// `update`: the available version and whether it is downloading already.
+    pub fn settings(&mut self, ui: &mut Ui, body: Rect, s: &mut Settings, has_media: bool, update: Option<(&str, bool)>) -> Vec<PanelAction> {
         let t = tokens();
         let mut acts = Vec::new();
         let area = body.inset(t.spacing.l);
@@ -57,8 +60,8 @@ impl PanelState {
 
         // header with the File Info button
         let lh = ui.r.line_height(15.0);
-        ui.r.text("Settings", x, y + (30.0 - lh) / 2.0, 15.0, Weight::DemiBold, text);
-        let label = "File Info";
+        ui.r.text(tr("Settings"), x, y + (30.0 - lh) / 2.0, 15.0, Weight::DemiBold, text);
+        let label = tr("File Info");
         let bw = ui.r.text_width(label, 13.0, Weight::DemiBold) + 24.0;
         let btn = Rect::new(x + w - bw, y + 1.0, bw, 28.0);
         let r = ui.interact(id("settings/info"), btn, Interact { enabled: has_media, ..Interact::default() });
@@ -87,6 +90,7 @@ impl PanelState {
             }};
         }
         let auto: &[(&str, &str)] = &[("auto", "Auto"), ("on", "On"), ("off", "Off")];
+        seg!("language", "Language", s.language, &[("auto", "Auto"), ("en", "English"), ("ru", "Русский"), ("uk", "Українська")]);
         seg!("glass_style", "Glass Style", s.glass_style, &[("auto", "Auto"), ("regular", "Regular"), ("clear", "Clear")]);
         seg!("dock_style", "Dock Shape", s.dock_style, &[("unified", "Single"), ("grouped", "Grouped")]);
         seg!("reduce_transparency", "Reduce Transparency", s.reduce_transparency, auto);
@@ -95,8 +99,8 @@ impl PanelState {
 
         let toggle = |ui: &mut Ui, key: &'static str, label: &str, hint: &str, value: &mut bool, y: &mut f32, acts: &mut Vec<PanelAction>| {
             let tw = w - 44.0 - t.spacing.m;
-            let hint_lines = if hint.is_empty() { vec![] } else { ui.r.wrap(hint, 11.0, Weight::Regular, tw, false) };
-            let label_lines = ui.r.wrap(label, 13.0, Weight::Medium, tw, false);
+            let hint_lines = if hint.is_empty() { vec![] } else { ui.r.wrap(tr(hint), 11.0, Weight::Regular, tw, false) };
+            let label_lines = ui.r.wrap(tr(label), 13.0, Weight::Medium, tw, false);
             let (l13, l11) = (ui.r.line_height(13.0), ui.r.line_height(11.0));
             let texts_h = l13 * label_lines.len() as f32 + l11 * hint_lines.len() as f32;
             let h = (texts_h + 10.0).max(34.0);
@@ -131,7 +135,7 @@ impl PanelState {
         // glass transparency slider
         {
             let lh = ui.r.line_height(13.0);
-            ui.r.text("Glass Transparency", x, y + (40.0 - lh) / 2.0, 13.0, Weight::Medium, text);
+            ui.r.text(tr("Glass Transparency"), x, y + (40.0 - lh) / 2.0, 13.0, Weight::Medium, text);
             let rect = Rect::new(x + w * 0.5, y + 10.0, w * 0.5 - 6.0, 20.0);
             // slider left = clearest: the stored value is "how frosted", shown as "how transparent"
             let r = ui.slider(id("settings/glass_opacity"), rect, crate::ui::SliderOpts { value: 1.0 - s.glass_opacity, ticks: &[], step: 0.05, big_step: 0.2, enabled: true });
@@ -157,11 +161,12 @@ impl PanelState {
         toggle(ui, "resume_playback", "Resume Where I Left Off", "", &mut s.resume_playback, &mut y, &mut acts);
         toggle(ui, "loop_file", "Loop", "Repeats the current video or track", &mut s.loop_file, &mut y, &mut acts);
         toggle(ui, "autoplay_next", "Play Next File in Folder", "Continues with the next file when one ends", &mut s.autoplay_next, &mut y, &mut acts);
+        toggle(ui, "check_updates", "Check for Updates", "Looks for a new version on GitHub at startup", &mut s.check_updates, &mut y, &mut acts);
         toggle(ui, "generate_artwork", "Generate Artwork for Tracks Without Cover", "Uses the local ComfyUI studio if it's installed", &mut s.generate_artwork, &mut y, &mut acts);
 
         // accent swatches
         let lh = ui.r.line_height(13.0);
-        ui.r.text("Accent", x, y + (40.0 - lh) / 2.0, 13.0, Weight::Medium, text);
+        ui.r.text(tr("Accent"), x, y + (40.0 - lh) / 2.0, 13.0, Weight::Medium, text);
         let gap = t.spacing.s;
         let mut sx = x + w - (ACCENTS.len() as f32 * 22.0 + (ACCENTS.len() as f32 - 1.0) * gap);
         for (i, hex) in ACCENTS.iter().enumerate() {
@@ -180,6 +185,22 @@ impl PanelState {
             sx += 22.0 + gap;
         }
         y += 40.0;
+
+        if let Some((version, busy)) = update {
+            let label = if busy { tr("Downloading update…").to_string() } else { crate::i18n::tr1("Update to {}", version) };
+            let btn = Rect::new(x, y + 4.0, w, 34.0);
+            let r = ui.interact(id("settings/update"), btn, Interact { enabled: !busy, ..Interact::default() });
+            let mut bg = ui.th.accent;
+            bg[3] = if busy { 0.45 } else { 0.85 + 0.15 * r.hover };
+            ui.r.rrect(btn, 17.0, bg);
+            let (tw, bh) = (ui.r.text_width(&label, 13.0, Weight::DemiBold), ui.r.line_height(13.0));
+            ui.r.text(&label, btn.x + (btn.w - tw) / 2.0, btn.y + (btn.h - bh) / 2.0, 13.0, Weight::DemiBold, [1.0, 1.0, 1.0, 1.0]);
+            ui.focus_ring(id("settings/update"), btn, 17.0, -2.0);
+            if r.clicked {
+                acts.push(PanelAction::UpdateRequested);
+            }
+            y += 46.0;
+        }
         ui.r.pop_clip();
         self.content_h = y - top;
         if changed {
@@ -208,10 +229,10 @@ impl PanelState {
         let top = y;
         let (primary, secondary) = (ui.th.c.text_primary.0, ui.th.c.text_secondary.0);
         let lh = ui.r.line_height(15.0);
-        ui.r.text("File Information", x, y + (30.0 - lh) / 2.0, 15.0, Weight::DemiBold, primary);
+        ui.r.text(tr("File Information"), x, y + (30.0 - lh) / 2.0, 15.0, Weight::DemiBold, primary);
         y += 30.0 + t.spacing.xs;
         if sections.is_empty() {
-            ui.r.text("Nothing is playing.", x, y, 13.0, Weight::Regular, secondary);
+            ui.r.text(tr("Nothing is playing."), x, y, 13.0, Weight::Regular, secondary);
             y += ui.r.line_height(13.0);
         }
         let label_w = 136.0;
@@ -219,7 +240,7 @@ impl PanelState {
         let (l12, l13) = (ui.r.line_height(12.0), ui.r.line_height(13.0));
         for (si, sec) in sections.iter().enumerate() {
             y += t.spacing.s;
-            ui.r.text(sec.title, x, y, 12.0, Weight::DemiBold, secondary);
+            ui.r.text(tr(sec.title), x, y, 12.0, Weight::DemiBold, secondary);
             y += l12 + 2.0 + 2.0;
             for (ri, (label, value)) in sec.rows.iter().enumerate() {
                 let lines = ui.r.wrap(value, 13.0, Weight::Medium, value_w, true);
@@ -232,7 +253,7 @@ impl PanelState {
                 if r.clicked {
                     acts.push(PanelAction::Copy(value.clone()));
                 }
-                let l = ui.r.elide(label, 13.0, Weight::Regular, label_w);
+                let l = ui.r.elide(tr(label), 13.0, Weight::Regular, label_w);
                 ui.r.text(&l, x, y, 13.0, Weight::Regular, secondary);
                 for (i, line) in lines.iter().enumerate() {
                     ui.r.text(line, rect.x, y + i as f32 * l13, 13.0, Weight::Medium, primary);
@@ -249,7 +270,8 @@ impl PanelState {
 /// Auto / On / Off style choice with a sliding knob. Returns true when the value changed.
 fn segmented(ui: &mut Ui, key: &'static str, label: &str, rect: Rect, value: &mut String, options: &[(&str, &str)]) -> bool {
     let wid = id(key);
-    let seg_w = 58.0;
+    let label = tr(label);
+    let seg_w = options.iter().map(|o| ui.r.text_width(tr(o.1), 12.0, Weight::DemiBold) + 18.0).fold(58.0, f32::max);
     let track = Rect::new(rect.right() - seg_w * options.len() as f32, rect.y + 3.0, seg_w * options.len() as f32, 28.0);
     let r = ui.interact(wid, track, Interact { press_scale: 1.0, keys: false, ..Interact::default() });
     let index = options.iter().position(|o| o.0 == value).unwrap_or(0);
@@ -283,9 +305,9 @@ fn segmented(ui: &mut Ui, key: &'static str, label: &str, rect: Rect, value: &mu
     ui.r.rrect(Rect::new(track.x + knob + 2.0, track.y + 2.0, seg_w - 4.0, 24.0), 12.0, if ui.th.light { [1.0, 1.0, 1.0, 1.0] } else { [1.0, 1.0, 1.0, 0.22] });
     let l12 = ui.r.line_height(12.0);
     for (i, o) in options.iter().enumerate() {
-        let tw = ui.r.text_width(o.1, 12.0, Weight::DemiBold);
+        let tw = ui.r.text_width(tr(o.1), 12.0, Weight::DemiBold);
         let c = if i == index { ui.th.c.text_primary.0 } else { ui.th.c.text_secondary.0 };
-        ui.r.text(o.1, track.x + i as f32 * seg_w + (seg_w - tw) / 2.0, track.y + (track.h - l12) / 2.0, 12.0, Weight::DemiBold, c);
+        ui.r.text(tr(o.1), track.x + i as f32 * seg_w + (seg_w - tw) / 2.0, track.y + (track.h - l12) / 2.0, 12.0, Weight::DemiBold, c);
     }
     ui.focus_ring(wid, track, 14.0, -2.0);
     changed

@@ -14,6 +14,8 @@ pub struct Settings {
     pub volume: f32,
     pub muted: bool,
     /// auto | regular | clear
+    /// auto (Windows language) | en | ru | uk
+    pub language: String,
     pub glass_style: String,
     /// unified (one pill) | grouped (separate capsules)
     pub dock_style: String,
@@ -36,6 +38,7 @@ pub struct Settings {
     pub resume_positions: IndexMap<String, f64>,
     pub last_folder: String,
     pub generate_artwork: bool,
+    pub check_updates: bool,
 }
 
 impl Default for Settings {
@@ -44,6 +47,7 @@ impl Default for Settings {
             window_rect: None,
             volume: 80.0,
             muted: false,
+            language: "auto".into(),
             glass_style: "auto".into(),
             dock_style: "unified".into(),
             background_extension: true,
@@ -60,6 +64,7 @@ impl Default for Settings {
             resume_positions: IndexMap::new(),
             last_folder: String::new(),
             generate_artwork: false,
+            check_updates: true,
         }
     }
 }
@@ -80,6 +85,7 @@ impl Settings {
             window_rect: field(&raw, "window_rect", d.window_rect),
             volume: field(&raw, "volume", d.volume),
             muted: field(&raw, "muted", d.muted),
+            language: field(&raw, "language", d.language),
             glass_style: field(&raw, "glass_style", d.glass_style),
             dock_style: field(&raw, "dock_style", d.dock_style),
             background_extension: field(&raw, "background_extension", d.background_extension),
@@ -96,6 +102,7 @@ impl Settings {
             resume_positions: field(&raw, "resume_positions", d.resume_positions),
             last_folder: field(&raw, "last_folder", d.last_folder),
             generate_artwork: field(&raw, "generate_artwork", d.generate_artwork),
+            check_updates: field(&raw, "check_updates", d.check_updates),
         }
     }
 

@@ -140,7 +140,7 @@ impl ContentState {
         ui.r.push(card.center(), 0.96 + 0.04 * show, (0.0, 0.0), a);
         ui.glass(GlassSpec { role: Role::Material, shapes: vec![(card, 26.0, 0.0)], dim: 0.0, shimmer: -1.0, overlap: 0.0 });
         ui.r.rrect_stroke(card, 26.0, 1.0, [1.0, 1.0, 1.0, 0.10]);
-        let (t1, t2) = ("Drop a video or audio file here", "or press O");
+        let (t1, t2) = (crate::i18n::tr("Drop a video or audio file here"), crate::i18n::tr("or press O"));
         let (l1, l2) = (ui.r.line_height(18.0), ui.r.line_height(13.0));
         let gap = tokens().spacing.s;
         let y = card.y + (card.h - (l1 + gap + l2)) / 2.0;

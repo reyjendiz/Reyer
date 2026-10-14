@@ -153,7 +153,7 @@ pub fn menu(ui: &mut Ui, current: &mut usize, body: Rect, progress: f32, title: 
     let mut y = body.y + s;
     if !title.is_empty() {
         let lh = ui.r.line_height(12.0);
-        ui.r.text(title, body.x + s + m, y + (TITLE_H - lh) / 2.0, 12.0, Weight::DemiBold, ui.th.c.text_secondary.0);
+        ui.r.text(crate::i18n::tr(title), body.x + s + m, y + (TITLE_H - lh) / 2.0, 12.0, Weight::DemiBold, ui.th.c.text_secondary.0);
         y += TITLE_H;
     }
     if !items.is_empty() {

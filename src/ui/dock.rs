@@ -426,7 +426,7 @@ impl DockState {
             self.press(ui);
             acts.push(DockAction::StepSpeed(-1));
         }
-        let speed_label = format!("Playback speed {}. Click to reset, hold for presets", format_speed(inp.speed));
+        let speed_label = crate::i18n::tr1("Playback speed {}. Click to reset, hold for presets", &format_speed(inp.speed));
         let now_text = format_speed(inp.speed);
         let prev_text = self.prev_speed.clone();
         let dir = self.roll_dir;

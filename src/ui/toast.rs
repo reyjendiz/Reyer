@@ -24,6 +24,7 @@ impl ToastState {
     }
 
     pub fn show(&mut self, text: &str, now: Instant) {
+        let text = crate::i18n::tr(text);
         if self.grow.value > 0.02 && self.message != text {
             self.previous = std::mem::take(&mut self.message);
             self.swap.snap(0.0);

@@ -45,6 +45,8 @@ Name: "{autodesktop}\Reyer"; Filename: "{app}\Reyer.exe"; Tasks: desktopicon
 
 [Run]
 Filename: "{app}\Reyer.exe"; Description: "{cm:LaunchProgram,Reyer}"; Flags: nowait postinstall skipifsilent
+; silent installs come from the in-app updater: start the new version again
+Filename: "{app}\Reyer.exe"; Flags: nowait runasoriginaluser skipifnotsilent
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}"

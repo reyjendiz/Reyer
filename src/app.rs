@@ -445,13 +445,16 @@ impl App {
         }
 
         // Mouse activity & parallax light direction
-        if input.moved || input.pressed || input.wheel != 0.0 || !input.keys.is_empty() {
-            self.activity();
+        if input.moved {
             let (mx, my) = input.mouse;
             self.theme.light_dir = [
                 -0.55 + (mx / w.max(1.0) - 0.5) * 0.35,
                 -0.83 + (my / h.max(1.0) - 0.5) * 0.25,
             ];
+        }
+        // moving the pointer elsewhere does not bring the controls back; hovering them does (below)
+        if input.pressed || input.wheel != 0.0 || !input.keys.is_empty() {
+            self.activity();
         }
 
         // Drag & drop files
@@ -489,7 +492,12 @@ impl App {
         }
 
         // Auto-hide chrome logic
-        let hold_chrome = !self.player.has_media()
+        let d = self.dock_state.rect;
+        let (mx, my) = input.mouse;
+        // the dock's footprint plus a margin, down to the window edge: hovering it reveals and holds the controls
+        let over_dock = input.mouse_in && mx >= d.x - 24.0 && mx <= d.x + d.w + 24.0 && my >= d.y - 24.0;
+        let hold_chrome = over_dock
+            || !self.player.has_media()
             || self.player.paused()
             || self.popover.is_open()
             || self.dock_state.busy

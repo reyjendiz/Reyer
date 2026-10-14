@@ -58,12 +58,17 @@ impl Popover {
     fn layout(&mut self, a: Rect, window: (f32, f32)) {
         self.src = a;
         let w = self.size.0.min(window.0 - 24.0).max(1.0);
-        let h = self.size.1.min(window.1 - 24.0).max(1.0);
+        let mut h = self.size.1.min(window.1 - 24.0).max(1.0);
         let x = (a.x + a.w / 2.0 - w / 2.0).clamp(12.0, (window.0 - w - 12.0).max(12.0));
-        let mut y = a.y - h - 12.0;
-        if y < 12.0 {
-            y = (a.bottom() + 12.0).min(window.1 - h - 12.0);
-        }
+        // the anchor sits inside the dock, so the gap is measured from the button: about 16 px of air above the dock
+        let gap = 26.0;
+        let room_above = a.y - gap - 12.0;
+        let y = if room_above >= 200.0 {
+            h = h.min(room_above); // panels scroll, so a short window just gets a shorter popover
+            a.y - h - gap
+        } else {
+            (a.bottom() + 12.0).min(window.1 - h - 12.0)
+        };
         self.dst = Rect::new(x, y.max(12.0), w, h);
     }
 

@@ -18,6 +18,8 @@ pub struct Settings {
     /// unified (one pill) | grouped (separate capsules)
     pub dock_style: String,
     pub background_extension: bool,
+    /// 0 = clearest glass .. 1 = most frosted; the same for the dock, menus and toasts.
+    pub glass_opacity: f32,
     pub accent: String,
     /// auto | on | off (auto follows Windows)
     pub reduce_transparency: String,
@@ -43,6 +45,7 @@ impl Default for Settings {
             glass_style: "auto".into(),
             dock_style: "unified".into(),
             background_extension: true,
+            glass_opacity: 0.2,
             accent: "#FF6A3D".into(),
             reduce_transparency: "auto".into(),
             increase_contrast: "auto".into(),
@@ -77,6 +80,7 @@ impl Settings {
             glass_style: field(&raw, "glass_style", d.glass_style),
             dock_style: field(&raw, "dock_style", d.dock_style),
             background_extension: field(&raw, "background_extension", d.background_extension),
+            glass_opacity: field::<f32>(&raw, "glass_opacity", d.glass_opacity).clamp(0.0, 1.0),
             accent: field(&raw, "accent", d.accent),
             reduce_transparency: field(&raw, "reduce_transparency", d.reduce_transparency),
             increase_contrast: field(&raw, "increase_contrast", d.increase_contrast),

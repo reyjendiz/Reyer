@@ -36,6 +36,8 @@ pub struct Theme {
     pub cv: &'static Palette,
     pub accent: Rgba,
     glass_style: String,
+    /// Settings > Glass Transparency: 0 clear .. 1 frosted, applied to every glass element alike.
+    pub glass_opacity: f32,
     /// The specular light shifts subtly with the pointer.
     pub light_dir: [f32; 2],
 }
@@ -79,6 +81,7 @@ impl Theme {
             cv: if increase_contrast { &t.colors.increased_contrast } else { &t.colors.dark },
             accent: if increase_contrast { lighter(accent, 1.3) } else { accent },
             glass_style: settings.glass_style.clone(),
+            glass_opacity: settings.glass_opacity,
             light_dir,
         }
     }

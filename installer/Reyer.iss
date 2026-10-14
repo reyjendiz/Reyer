@@ -55,14 +55,14 @@ const
   AudioExts = '.m4a .m4b .m4r .caf .aif .aiff .aifc .mp3 .flac .wav .aac .ogg .oga .opus .wma .ape .wv .ac3 .eac3 .dts .mka .alac .mp2 .tta';
 
 // same registrations as tools\register_associations.ps1, under HKCU or HKLM depending on install mode
-procedure SetProgId(Id, Name: String);
+procedure SetProgId(Id, Name, IconFile: String);
 var
   Key: String;
 begin
   Key := 'Software\Classes\' + Id;
   RegWriteStringValue(HKA, Key, '', Name);
   RegWriteStringValue(HKA, Key, 'FriendlyTypeName', Name);
-  RegWriteStringValue(HKA, Key + '\DefaultIcon', '', '"' + ExpandConstant('{app}\Reyer.exe') + '",0');
+  RegWriteStringValue(HKA, Key + '\DefaultIcon', '', ExpandConstant('{app}\icons\') + IconFile);
   RegWriteStringValue(HKA, Key + '\shell\open\command', '', '"' + ExpandConstant('{app}\Reyer.exe') + '" "%1"');
 end;
 
@@ -92,8 +92,8 @@ procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if (CurStep = ssPostInstall) and WizardIsTaskSelected('assoc') then
   begin
-    SetProgId('Reyer.Video', 'Video (Reyer)');
-    SetProgId('Reyer.Audio', 'Audio (Reyer)');
+    SetProgId('Reyer.Video', 'Video (Reyer)', 'reyer_video.ico');
+    SetProgId('Reyer.Audio', 'Audio (Reyer)', 'reyer_audio.ico');
     RegWriteStringValue(HKA, 'Software\Reyer\Capabilities', 'ApplicationName', 'Reyer');
     RegWriteStringValue(HKA, 'Software\Reyer\Capabilities', 'ApplicationDescription', 'A small Liquid Glass video and audio player.');
     ForEachExt(VideoExts, 'Reyer.Video', False);

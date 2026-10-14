@@ -128,6 +128,21 @@ impl PanelState {
             ui.focus_ring(id(key), sw, 13.0, -2.0);
             *y += h + 2.0;
         };
+        // glass transparency slider
+        {
+            let lh = ui.r.line_height(13.0);
+            ui.r.text("Glass Transparency", x, y + (40.0 - lh) / 2.0, 13.0, Weight::Medium, text);
+            let rect = Rect::new(x + w * 0.5, y + 10.0, w * 0.5 - 6.0, 20.0);
+            // slider left = clearest: the stored value is "how frosted", shown as "how transparent"
+            let r = ui.slider(id("settings/glass_opacity"), rect, crate::ui::SliderOpts { value: 1.0 - s.glass_opacity, ticks: &[], step: 0.05, big_step: 0.2, enabled: true });
+            if let Some(v) = r.moved {
+                s.glass_opacity = 1.0 - v;
+            }
+            if r.committed.is_some() {
+                acts.push(PanelAction::Changed);
+            }
+            y += 42.0;
+        }
         toggle(ui, "background_extension", "Background Extension", "Fill letterbox bars with the video's edge light", &mut s.background_extension, &mut y, &mut acts);
         toggle(ui, "hwdec", "Hardware Decoding", "", &mut s.hwdec, &mut y, &mut acts);
         toggle(

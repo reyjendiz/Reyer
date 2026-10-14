@@ -27,6 +27,8 @@ foreach ($dir in "backgrounds", "art") {
     New-Item -ItemType Directory -Path "$out\assets\$dir" -Force | Out-Null
     Copy-Item "assets\$dir\*" "$out\assets\$dir" -Recurse
 }
+New-Item -ItemType Directory -Path "$out\icons" -Force | Out-Null
+Copy-Item "assets\icon\reyer_video.ico", "assets\icon\reyer_audio.ico" "$out\icons"
 Copy-Item "LICENSE" $out
 
 Write-Host "Built $out\Reyer.exe"

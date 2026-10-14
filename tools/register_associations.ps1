@@ -30,16 +30,16 @@ if ($Unregister) {
 if (-not (Test-Path $Exe)) { throw "Reyer.exe not found at $Exe (build it first or pass -Exe)." }
 $exePath = (Resolve-Path $Exe).Path
 
-function Set-ProgId($id, $name) {
+function Set-ProgId($id, $name, $icon) {
     New-Item -Path "$classes\$id\shell\open\command" -Force | Out-Null
     Set-ItemProperty -Path "$classes\$id" -Name "(default)" -Value $name
     Set-ItemProperty -Path "$classes\$id" -Name "FriendlyTypeName" -Value $name
     New-Item -Path "$classes\$id\DefaultIcon" -Force | Out-Null
-    Set-ItemProperty -Path "$classes\$id\DefaultIcon" -Name "(default)" -Value "`"$exePath`",0"
+    Set-ItemProperty -Path "$classes\$id\DefaultIcon" -Name "(default)" -Value (Join-Path (Split-Path $exePath) "icons\$icon")
     Set-ItemProperty -Path "$classes\$id\shell\open\command" -Name "(default)" -Value "`"$exePath`" `"%1`""
 }
-Set-ProgId "Reyer.Video" "Video (Reyer)"
-Set-ProgId "Reyer.Audio" "Audio (Reyer)"
+Set-ProgId "Reyer.Video" "Video (Reyer)" "reyer_video.ico"
+Set-ProgId "Reyer.Audio" "Audio (Reyer)" "reyer_audio.ico"
 
 New-Item -Path "$capabilities\FileAssociations" -Force | Out-Null
 Set-ItemProperty -Path $capabilities -Name "ApplicationName" -Value "Reyer"

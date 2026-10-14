@@ -491,6 +491,8 @@ impl App {
             }
         }
 
+        self.theme.glass_opacity = self.settings.glass_opacity; // live while the slider moves
+
         // Auto-hide chrome logic
         let d = self.dock_state.rect;
         let (mx, my) = input.mouse;

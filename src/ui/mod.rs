@@ -380,7 +380,13 @@ impl<'a> Ui<'a> {
         let pal = if clear { self.th.cv } else { self.th.c };
         let tint_src = if clear { pal.glass_tint.0 } else { pal.glass_tint_regular.0 };
         let mut tint = tint_src;
-        tint[3] = (tint[3] + g.overlap * t.overlap_opacity_boost).min(1.0);
+        // one transparency for dock, pill, menus and toasts; the slider in Settings moves it
+        let o = self.th.glass_opacity.clamp(0.0, 1.0);
+        let unified = !material;
+        if unified {
+            tint[3] = 0.02 + 0.55 * o;
+        }
+        tint[3] = (tint[3] + g.overlap * t.overlap_opacity_boost * if unified { 0.3 } else { 1.0 }).min(1.0);
         let frosted = self.th.reduce_transparency || self.r.backdrop.is_none();
         let dim = if self.th.increase_contrast && clear { t.dimming } else { g.dim };
         self.r.glass(&GlassParams {
@@ -392,9 +398,8 @@ impl<'a> Ui<'a> {
             frosted,
             // Clear shows mostly the sharp content (light lensing at the rim), Regular a soft blur
             blur_mix: match variant {
-                Variant::Clear => -0.35,
-                Variant::Regular => 1.0,
                 Variant::Material => 0.4,
+                _ => -0.35 + 1.35 * o,
             },
             refraction: if material { 0.0 } else { params.refraction },
             saturation: params.saturation,

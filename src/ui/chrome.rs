@@ -87,7 +87,8 @@ impl ChromeState {
             ui.over_chrome = true;
         }
 
-        ui.r.push_alpha(inp.chrome_t);
+        let ct = inp.chrome_t.clamp(0.0, 1.0);
+        ui.r.push((win_w / 2.0, 0.0), 0.97 + 0.03 * ct, (0.0, 0.0), ct);
         ui.glass(GlassSpec {
             role: Role::Cluster,
             shapes: vec![(if has_title { pill } else { Rect::ZERO }, ph / 2.0, 0.0), (cluster, height / 2.0, 0.0)],

@@ -206,7 +206,7 @@ impl App {
             launch: Spring::new(Preset::Smooth),
             rise_card: Spring::new(Preset::Smooth),
             rise_dock: Spring::new(Preset::Smooth),
-            chrome_spring: Spring::at(Preset::Smooth, 1.0),
+            chrome_spring: Spring::at(Preset::Snappy, 1.0),
             fs_scale: Spring::at(Preset::Smooth, 1.0),
             video_size: (0, 0),
             dock_dim_spring: Spring::new(Preset::Smooth),
@@ -639,8 +639,8 @@ impl App {
 
         // 3. Decor and Edge Bands
         if self.player.has_video() && chrome_t > 0.01 {
-            g.r.edge_band(Rect::new(0.0, 0.0, w, 96.0), true, 0.18, chrome_t);
-            g.r.edge_band(Rect::new(0.0, h - 132.0, w, 132.0), false, 0.18, chrome_t);
+            g.r.edge_band(Rect::new(0.0, 0.0, w, 96.0), true, 0.05, chrome_t);
+            g.r.edge_band(Rect::new(0.0, h - 132.0, w, 132.0), false, 0.05, chrome_t);
         }
 
         // 4. UI Layer: Top Chrome, Dock, Overlay Popovers

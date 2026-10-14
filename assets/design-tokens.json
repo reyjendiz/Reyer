@@ -79,7 +79,7 @@
     "rimLow": 0.05,
     "parallax": 3,
     "shadowBlur": 40,
-    "shadowOpacity": 0.30,
+    "shadowOpacity": 0.0,
     "smoothUnion": 10,
     "overlapOpacityBoost": 0.25
   },

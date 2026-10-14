@@ -423,7 +423,7 @@ impl<'a> Ui<'a> {
         let o = Interact { enabled: style.enabled, label: style.label, long_press: style.long_press, press_scale: style.press_scale, ..Interact::default() };
         let resp = self.interact(id, rect, o);
         let c = rect.center();
-        self.r.push(c, resp.scale * (1.0 + 0.07 * resp.hover), (0.0, 0.0), if style.enabled { 1.0 } else { 0.4 });
+        self.r.push(c, resp.scale * (1.0 + 0.04 * resp.hover), (0.0, 0.0), if style.enabled { 1.0 } else { 0.4 });
         let hl = Rect::new(c.0, c.1, 0.0, 0.0);
         let hw = if style.wide { rect.w - 4.0 } else { rect.w.min(rect.h) - 4.0 };
         let hl = Rect::new(hl.x - hw / 2.0, c.1 - (rect.h - 4.0) / 2.0, hw, rect.h - 4.0);

@@ -219,7 +219,6 @@ impl ContentState {
             28.0 + (cover.h - 28.0) * k,
         );
         let radius = (live.w * 0.05).max(8.0);
-        ui.r.shadow(live, radius, 18.0, 14.0, [0.0, 0.0, 0.0, 0.45]);
         ui.r.push(live.center(), sw, (0.0, 0.0), 1.0);
         match np.cover {
             Some(tex) => ui.r.image(tex, live, [0.0, 0.0, 1.0, 1.0], radius, 1.0),
@@ -230,17 +229,6 @@ impl ContentState {
             ui.r.rrect(live, radius, [np.tint[0], np.tint[1], np.tint[2], 0.3]);
         }
         ui.r.pop();
-        // soft reflection: the cover mirrored below, fading out into the background
-        if let Some(tex) = np.cover {
-            // drawn in strips of falling opacity, so it fades into whatever background is behind
-            const STRIPS: usize = 12;
-            let (top, rh) = (live.bottom() + 6.0, live.h * 0.3);
-            for j in 0..STRIPS {
-                let (f0, f1) = (j as f32 / STRIPS as f32, (j + 1) as f32 / STRIPS as f32);
-                let strip = Rect::new(live.x, top + rh * f0, live.w, rh / STRIPS as f32 + 0.5);
-                ui.r.image(tex, strip, [0.0, 1.0 - 0.3 * f0, 1.0, 1.0 - 0.3 * f1], 0.0, 0.2 * (1.0 - f0));
-            }
-        }
 
         // title, artist and album slide in with a stagger
         let x = cover.right() + gap;

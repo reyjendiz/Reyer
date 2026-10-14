@@ -15,8 +15,11 @@ uniform vec4 light;         // light direction x, y; rim strength; white tint
 
 vec4 track(vec2 q) {        // q in px from the knob centre -> premultiplied colour
     float band = clamp(halfThick - abs(q.y) + 0.5, 0.0, 1.0);
-    vec4 c = q.x < 0.0 ? vec4(accent.rgb, 1.0) : trackColor;
-    return vec4(c.rgb * c.a, c.a) * band;
+    // the filled part ends in a round cap (centre one half-thickness left of the knob), not a straight cut
+    vec2 cap = vec2(max(q.x + halfThick, 0.0), q.y);
+    float fill = clamp(halfThick - length(cap) + 0.5, 0.0, 1.0);
+    vec4 base = vec4(trackColor.rgb * trackColor.a, trackColor.a) * band;
+    return vec4(accent.rgb, 1.0) * fill + base * (1.0 - fill);
 }
 
 void main() {

@@ -140,6 +140,7 @@ impl PanelState {
             &mut acts,
         );
         toggle(ui, "resume_playback", "Resume Where I Left Off", "", &mut s.resume_playback, &mut y, &mut acts);
+        toggle(ui, "autoplay_next", "Play Next File in Folder", "Continues with the next file when one ends", &mut s.autoplay_next, &mut y, &mut acts);
         toggle(ui, "generate_artwork", "Generate Artwork for Tracks Without Cover", "Uses the local ComfyUI studio if it's installed", &mut s.generate_artwork, &mut y, &mut acts);
 
         // accent swatches

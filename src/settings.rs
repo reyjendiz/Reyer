@@ -27,6 +27,8 @@ pub struct Settings {
     /// Bitstream Dolby/DTS to an AV receiver over HDMI/S/PDIF.
     pub audio_passthrough: bool,
     pub resume_playback: bool,
+    /// Play the next file of the folder when one ends.
+    pub autoplay_next: bool,
     pub resume_positions: IndexMap<String, f64>,
     pub last_folder: String,
     pub generate_artwork: bool,
@@ -48,6 +50,7 @@ impl Default for Settings {
             hwdec: true,
             audio_passthrough: false,
             resume_playback: true,
+            autoplay_next: true,
             resume_positions: IndexMap::new(),
             last_folder: String::new(),
             generate_artwork: false,
@@ -81,6 +84,7 @@ impl Settings {
             hwdec: field(&raw, "hwdec", d.hwdec),
             audio_passthrough: field(&raw, "audio_passthrough", d.audio_passthrough),
             resume_playback: field(&raw, "resume_playback", d.resume_playback),
+            autoplay_next: field(&raw, "autoplay_next", d.autoplay_next),
             resume_positions: field(&raw, "resume_positions", d.resume_positions),
             last_folder: field(&raw, "last_folder", d.last_folder),
             generate_artwork: field(&raw, "generate_artwork", d.generate_artwork),

@@ -96,7 +96,7 @@
     "fadeFast": 160,
     "fadeSlow": 240,
     "reducedMotionFade": 120,
-    "autoHide": 2500,
+    "autoHide": 1800,
     "clickDelay": 200,
     "toastHold": 1300,
     "volumeCollapse": 1500,

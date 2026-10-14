@@ -135,6 +135,7 @@ pub struct App {
     rise_dock: Spring,
     chrome_spring: Spring,
     fs_scale: Spring,
+    video_size: (i32, i32),
     dock_dim_spring: Spring,
     top_dim_spring: Spring,
 
@@ -206,6 +207,7 @@ impl App {
             rise_dock: Spring::new(Preset::Smooth),
             chrome_spring: Spring::at(Preset::Smooth, 1.0),
             fs_scale: Spring::at(Preset::Smooth, 1.0),
+            video_size: (0, 0),
             dock_dim_spring: Spring::new(Preset::Smooth),
             top_dim_spring: Spring::new(Preset::Smooth),
 
@@ -461,6 +463,11 @@ impl App {
         }
 
         // Render mpv frame into g.video target
+        // a resized target is blank until mpv draws again, which it won't do for a paused frame by itself
+        if self.video_size != (g.video.w, g.video.h) {
+            self.video_size = (g.video.w, g.video.h);
+            self.player.request_render();
+        }
         self.player.render(&g.video);
 
         // Letterbox "background extension": a 24 px copy of the picture, blurred, behind the video
@@ -488,7 +495,7 @@ impl App {
             || self.dock_state.busy
             || self.chrome_state.hovered
             || self.ui_state.nav
-            || self.ui_state.focus != 0;
+            || (self.ui_state.nav && self.ui_state.focus != 0); // a clicked button keeps focus but must not pin the chrome
 
         let auto_hide_dur = Duration::from_millis(tokens().timings.auto_hide as u64);
         let chrome_target = if hold_chrome || now.duration_since(self.last_activity) < auto_hide_dur {

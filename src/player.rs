@@ -319,7 +319,7 @@ impl Player {
                 if reached && !self.eof {
                     self.eof = true;
                     self.remember_position(settings, true);
-                    if !self.next(settings, ch) {
+                    if !(settings.autoplay_next && self.next(settings, ch)) {
                         self.set("pause", "yes");
                     }
                 } else {

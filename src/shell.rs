@@ -350,6 +350,11 @@ impl Running {
                     if self.window.fullscreen().is_some() {
                         self.window.set_fullscreen(None);
                     } else {
+                        // from a maximized window the client area stayed at work-area size and left a black strip
+                        // where the taskbar was; start from the normal state instead
+                        if self.window.is_maximized() {
+                            self.window.set_maximized(false);
+                        }
                         self.window.set_fullscreen(Some(Fullscreen::Borderless(None)));
                     }
                 }

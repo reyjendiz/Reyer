@@ -78,6 +78,7 @@ pub struct Player {
     pub cover: Option<Cover>,
     pub cover_rev: u32,
     needs_render: bool,
+    sub_margin: i32,
     speed_target: f32,
     volume_target: f32,
     passthrough_rejected: bool,
@@ -115,6 +116,7 @@ impl Player {
             cover: None,
             cover_rev: 0,
             needs_render: false,
+            sub_margin: 22,
             speed_target: 1.0,
             volume_target: settings.volume,
             passthrough_rejected: false,
@@ -143,7 +145,7 @@ impl Player {
         let path = mpv::find_libmpv().ok_or("libmpv-2.dll not found")?;
         let m = Mpv::load(&path)?;
         let hwdec = std::env::var("REYER_HWDEC").unwrap_or_else(|_| if settings.hwdec { "auto-safe".into() } else { "no".into() });
-        let opts: [(&str, String); 36] = [
+        let opts: [(&str, String); 37] = [
             ("vo", "libmpv".into()),
             ("keep-open", "yes".into()),
             ("idle", "yes".into()),
@@ -167,6 +169,7 @@ impl Player {
             ("audio-display", "no".into()),
             ("hwdec", hwdec),
             ("sub-auto", "fuzzy".into()),
+            ("sub-ass-force-margins", "yes".into()),
             ("audio-pitch-correction", "yes".into()),
             ("tone-mapping", "auto".into()),
             ("hdr-compute-peak", "auto".into()),
@@ -224,6 +227,15 @@ impl Player {
             if rc.update() & RENDER_UPDATE_FRAME != 0 {
                 self.needs_render = true;
             }
+        }
+    }
+
+    /// Lifts subtitles by `px` (in mpv's 720-line units) so the dock doesn't cover them.
+    pub fn set_sub_lift(&mut self, px: f32) {
+        let m = (22.0 + px).round() as i32;
+        if m != self.sub_margin {
+            self.sub_margin = m;
+            self.set("sub-margin-y", &m.to_string());
         }
     }
 

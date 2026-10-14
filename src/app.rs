@@ -509,6 +509,10 @@ impl App {
         let rise_c = self.rise_card.to(1.0, dt, self.theme.reduce_motion, &mut anim);
         let rise_d = self.rise_dock.to(1.0, dt, self.theme.reduce_motion, &mut anim);
         let fs = self.fs_scale.to(1.0, dt, self.theme.reduce_motion, &mut anim);
+        // subtitles ride above the dock while it is showing
+        let video_bottom = (vr[1] + vr[3]) * h;
+        let covered = (video_bottom - (self.dock_state.rect.y - 8.0)).max(0.0) * chrome_t;
+        self.player.set_sub_lift(covered * 720.0 / h.max(1.0));
 
         // Cursor visibility
         let cursor_show = chrome_t > 0.01 || !self.player.has_media() || input.hovering_files;

@@ -8,7 +8,7 @@ Playback is done by [libmpv](https://mpv.io), so anything mpv/ffmpeg can decode 
 
 ## Download
 
-Grab `Reyer-<version>-windows-x64.zip` from [Releases](https://github.com/reyjendiz/Reyer/releases/latest), unpack it anywhere and run `Reyer.exe`. Nothing to install, and libmpv is included. Windows 10/11 x64.
+Get `Reyer-<version>-windows-x64-setup.exe` from [Releases](https://github.com/reyjendiz/Reyer/releases/latest) and run it. It installs for the current user without admin rights (or for everyone if you choose so) and can register Reyer for video and audio files. Prefer no installer? Take `Reyer-<version>-windows-x64.zip`, unpack it anywhere and run `Reyer.exe`. libmpv is included in both. Windows 10/11 x64.
 
 ## Screenshots
 
@@ -90,7 +90,7 @@ With the mouse: click the video to play or pause, double-click for full screen, 
 powershell -ExecutionPolicy Bypass -File build.ps1
 ```
 
-This runs `cargo build --release` and produces a single-folder app in `dist\Reyer\` (with `Reyer.exe`, libmpv and the runtime images). Shaders, design tokens and the icon are embedded in the executable. Copy that folder anywhere.
+This runs `cargo build --release` and produces a single-folder app in `dist\Reyer\` (with `Reyer.exe`, libmpv and the runtime images). Shaders, design tokens and the icon are embedded in the executable. Copy that folder anywhere. Add `-Installer` to also build the setup exe with [Inno Setup 6](https://jrsoftware.org/isdl.php) (`installer\Reyer.iss`).
 
 ## Making Reyer the default player
 

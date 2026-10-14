@@ -1,7 +1,9 @@
 # Builds Reyer (Rust) in release mode and assembles a portable folder in dist\Reyer.
 # Shaders, design tokens and the window icon are embedded in the executable; only libmpv-2.dll
 # and the runtime images (assets\backgrounds, assets\art) are copied next to it.
+# With -Installer it also builds dist\Reyer-<version>-windows-x64-setup.exe (needs Inno Setup 6, iscc.exe).
 # Run from the project folder; requires the Rust toolchain (cargo) on PATH.
+param([switch]$Installer)
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
 
@@ -28,3 +30,15 @@ foreach ($dir in "backgrounds", "art") {
 Copy-Item "LICENSE" $out
 
 Write-Host "Built $out\Reyer.exe"
+
+if ($Installer) {
+    $iscc = (Get-Command iscc -ErrorAction SilentlyContinue).Source
+    if (-not $iscc) {
+        $iscc = @("$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe", "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe", "$env:ProgramFiles\Inno Setup 6\ISCC.exe") |
+            Where-Object { Test-Path $_ } | Select-Object -First 1
+    }
+    if (-not $iscc) { throw "Inno Setup 6 was not found. Install it from https://jrsoftware.org/isdl.php." }
+    $version = (Select-String -Path Cargo.toml -Pattern '^version = "(.+)"').Matches[0].Groups[1].Value
+    & $iscc "/DAppVersion=$version" "installer\Reyer.iss"
+    if ($LASTEXITCODE -ne 0) { throw "Inno Setup failed" }
+}

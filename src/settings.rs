@@ -31,6 +31,8 @@ pub struct Settings {
     pub resume_playback: bool,
     /// Play the next file of the folder when one ends.
     pub autoplay_next: bool,
+    /// Repeat the current video or track endlessly.
+    pub loop_file: bool,
     pub resume_positions: IndexMap<String, f64>,
     pub last_folder: String,
     pub generate_artwork: bool,
@@ -54,6 +56,7 @@ impl Default for Settings {
             audio_passthrough: false,
             resume_playback: true,
             autoplay_next: true,
+            loop_file: false,
             resume_positions: IndexMap::new(),
             last_folder: String::new(),
             generate_artwork: false,
@@ -89,6 +92,7 @@ impl Settings {
             audio_passthrough: field(&raw, "audio_passthrough", d.audio_passthrough),
             resume_playback: field(&raw, "resume_playback", d.resume_playback),
             autoplay_next: field(&raw, "autoplay_next", d.autoplay_next),
+            loop_file: field(&raw, "loop_file", d.loop_file),
             resume_positions: field(&raw, "resume_positions", d.resume_positions),
             last_folder: field(&raw, "last_folder", d.last_folder),
             generate_artwork: field(&raw, "generate_artwork", d.generate_artwork),

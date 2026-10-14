@@ -145,9 +145,10 @@ impl Player {
         let path = mpv::find_libmpv().ok_or("libmpv-2.dll not found")?;
         let m = Mpv::load(&path)?;
         let hwdec = std::env::var("REYER_HWDEC").unwrap_or_else(|_| if settings.hwdec { "auto-safe".into() } else { "no".into() });
-        let opts: [(&str, String); 37] = [
+        let opts: [(&str, String); 38] = [
             ("vo", "libmpv".into()),
             ("keep-open", "yes".into()),
+            ("loop-file", if settings.loop_file { "inf" } else { "no" }.into()),
             ("idle", "yes".into()),
             ("osc", "no".into()),
             ("osd-level", "0".into()),
@@ -700,6 +701,7 @@ impl Player {
                 let on = std::env::var("REYER_HWDEC").unwrap_or_else(|_| "auto-safe".into());
                 self.set("hwdec", if value { &on } else { "no" });
             }
+            "loop_file" => self.set("loop-file", if value { "inf" } else { "no" }),
             "generate_artwork" => self.art_wanted = value && self.is_audio() && self.cover.is_none(),
             _ => {}
         }

@@ -413,7 +413,7 @@ impl DockState {
         if let (Some(v), true) = (s.committed, d > 0.0) {
             acts.push(DockAction::Seek(v as f64 * d, true));
         }
-        self.busy = s.dragging || self.volume_open || hovering_dock;
+        self.busy = s.dragging || self.volume_open;
 
         // ---- speed: − 1.0× + --------------------------------------------------------------------------------
         let spx = ox + x_speed + pad + speed_nudge;

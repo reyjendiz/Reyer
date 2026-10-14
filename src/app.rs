@@ -145,6 +145,7 @@ pub struct App {
 
     chrome_visible: bool,
     last_activity: Instant,
+    last_mouse_move: Instant,
     last_click: Option<(Instant, (f32, f32))>,
     click_moved: bool,
 
@@ -217,6 +218,7 @@ impl App {
 
             chrome_visible: true,
             last_activity: Instant::now(),
+            last_mouse_move: Instant::now(),
             last_click: None,
             click_moved: false,
 
@@ -451,8 +453,14 @@ impl App {
                 -0.55 + (mx / w.max(1.0) - 0.5) * 0.35,
                 -0.83 + (my / h.max(1.0) - 0.5) * 0.25,
             ];
+            self.last_mouse_move = now;
+            // moving over the dock area or the top band brings the controls back; moving over the video doesn't
+            let d = self.dock_state.rect;
+            let band = tokens().sizes.chrome_height + 2.0 * tokens().spacing.m;
+            if my <= band || (mx >= d.x - 24.0 && mx <= d.x + d.w + 24.0 && my >= d.y - 24.0) {
+                self.activity();
+            }
         }
-        // moving the pointer elsewhere does not bring the controls back; hovering them does (below)
         if input.pressed || input.wheel != 0.0 || !input.keys.is_empty() {
             self.activity();
         }
@@ -494,16 +502,8 @@ impl App {
         self.theme.glass_opacity = self.settings.glass_opacity; // live while the slider moves
 
         // Auto-hide chrome logic
-        let d = self.dock_state.rect;
-        let (mx, my) = input.mouse;
-        // the dock's footprint plus a margin, down to the window edge: hovering it reveals and holds the controls
-        let over_dock = input.mouse_in && mx >= d.x - 24.0 && mx <= d.x + d.w + 24.0 && my >= d.y - 24.0;
-        let hold_chrome = over_dock
-            || !self.player.has_media()
-            || self.player.paused()
-            || self.popover.is_open()
-            || self.dock_state.busy
-            || self.chrome_state.hovered; // keys count as activity, so keyboard use never pins the controls
+        // a pointer resting on the controls doesn't hold them: they hide once it stops moving
+        let hold_chrome = !self.player.has_media() || self.player.paused() || self.popover.is_open() || self.dock_state.busy;
 
         let auto_hide_dur = Duration::from_millis(tokens().timings.auto_hide as u64);
         let chrome_target = if hold_chrome || now.duration_since(self.last_activity) < auto_hide_dur {
@@ -523,7 +523,7 @@ impl App {
         self.player.set_sub_lift(covered * 720.0 / h.max(1.0));
 
         // Cursor visibility
-        let cursor_show = chrome_t > 0.01 || !self.player.has_media() || input.hovering_files;
+        let cursor_show = chrome_target > 0.5 || now.duration_since(self.last_mouse_move) < auto_hide_dur || !self.player.has_media() || input.hovering_files;
         cmds.push(WinCmd::CursorVisible(cursor_show));
 
         // Sample video luminance for clear glass dimming hysteresis
@@ -1106,7 +1106,7 @@ impl App {
 
         let animating = events.animating || self.toast_state.visible() || self.popover.shown() || self.player.has_video();
         // timers that need a frame even when nothing moves
-        let hide_at = (self.player.has_media() && !self.player.paused()).then(|| self.last_activity + Duration::from_millis(tokens().timings.auto_hide as u64));
+        let hide_at = (self.player.has_media() && !self.player.paused()).then(|| self.last_activity.max(self.last_mouse_move) + Duration::from_millis(tokens().timings.auto_hide as u64));
         let deadline = [events.wake, self.track_toast.map(|t| t.0), self.save_geo_at, hide_at].into_iter().flatten().filter(|t| *t > now).min();
         FrameOut { animating, deadline, cmds }
     }

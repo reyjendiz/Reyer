@@ -1,0 +1,222 @@
+{
+  "ambient_1": {
+    "seed": 614277478,
+    "count": 3,
+    "prompt": "soft aurora ribbons of teal and violet light drifting over a deep dark background, frosted liquid glass, soft refraction, subtle specular highlights, deep dark background, Apple-style minimal, soft studio light, wide calm composition, low contrast, no text, no letters, no logo",
+    "size": [
+      1344,
+      768
+    ],
+    "batch_index": 2,
+    "file": "backgrounds/ambient_1.jpg"
+  },
+  "ambient_2": {
+    "seed": 528877070,
+    "count": 3,
+    "prompt": "large out of focus frosted glass discs overlapping, warm amber and rose glow, dark background, frosted liquid glass, soft refraction, subtle specular highlights, deep dark background, Apple-style minimal, soft studio light, wide calm composition, low contrast, no text, no letters, no logo",
+    "size": [
+      1344,
+      768
+    ],
+    "batch_index": 1,
+    "file": "backgrounds/ambient_2.jpg"
+  },
+  "ambient_3": {
+    "seed": 341599540,
+    "count": 3,
+    "prompt": "slow waves of translucent glass folds catching indigo and cyan light, deep navy darkness, frosted liquid glass, soft refraction, subtle specular highlights, deep dark background, Apple-style minimal, soft studio light, wide calm composition, low contrast, no text, no letters, no logo",
+    "size": [
+      1344,
+      768
+    ],
+    "batch_index": 2,
+    "file": "backgrounds/ambient_3.jpg"
+  },
+  "hero_scene": {
+    "seed": 726307326,
+    "count": 3,
+    "prompt": "cinematic wide landscape at blue hour, misty mountains above a calm lake, warm city lights on the far shore, film still, anamorphic lens, rich color, no people, no text, no letters, no logo",
+    "size": [
+      1344,
+      768
+    ],
+    "batch_index": 2,
+    "file": "readme/hero_scene.jpg"
+  },
+  "tile_01": {
+    "seed": 811465349,
+    "count": 2,
+    "prompt": "abstract album cover art, flowing translucent glass forms, crimson red light glowing through, soft gradients, square composition, frosted liquid glass, soft refraction, subtle specular highlights, deep dark background, Apple-style minimal, soft studio light, no text, no letters, no logo",
+    "size": [
+      1024,
+      1024
+    ],
+    "batch_index": 1,
+    "file": "art/tile_01.jpg"
+  },
+  "tile_02": {
+    "seed": 344377122,
+    "count": 2,
+    "prompt": "abstract album cover art, flowing translucent glass forms, tangerine orange light glowing through, soft gradients, square composition, frosted liquid glass, soft refraction, subtle specular highlights, deep dark background, Apple-style minimal, soft studio light, no text, no letters, no logo",
+    "size": [
+      1024,
+      1024
+    ],
+    "batch_index": 2,
+    "file": "art/tile_02.jpg"
+  },
+  "tile_03": {
+    "seed": 1862843861,
+    "count": 2,
+    "prompt": "abstract album cover art, flowing translucent glass forms, warm amber light glowing through, soft gradients, square composition, frosted liquid glass, soft refraction, subtle specular highlights, deep dark background, Apple-style minimal, soft studio light, no text, no letters, no logo",
+    "size": [
+      1024,
+      1024
+    ],
+    "batch_index": 2,
+    "file": "art/tile_03.jpg"
+  },
+  "tile_04": {
+    "seed": 23948639,
+    "count": 2,
+    "prompt": "abstract album cover art, flowing translucent glass forms, lime green light glowing through, soft gradients, square composition, frosted liquid glass, soft refraction, subtle specular highlights, deep dark background, Apple-style minimal, soft studio light, no text, no letters, no logo",
+    "size": [
+      1024,
+      1024
+    ],
+    "batch_index": 2,
+    "file": "art/tile_04.jpg"
+  },
+  "tile_05": {
+    "seed": 2086722863,
+    "count": 2,
+    "prompt": "abstract album cover art, flowing translucent glass forms, emerald green light glowing through, soft gradients, square composition, frosted liquid glass, soft refraction, subtle specular highlights, deep dark background, Apple-style minimal, soft studio light, no text, no letters, no logo",
+    "size": [
+      1024,
+      1024
+    ],
+    "batch_index": 2,
+    "file": "art/tile_05.jpg"
+  },
+  "tile_06": {
+    "seed": 1188424392,
+    "count": 2,
+    "prompt": "abstract album cover art, flowing translucent glass forms, deep teal light glowing through, soft gradients, square composition, frosted liquid glass, soft refraction, subtle specular highlights, deep dark background, Apple-style minimal, soft studio light, no text, no letters, no logo",
+    "size": [
+      1024,
+      1024
+    ],
+    "batch_index": 1,
+    "file": "art/tile_06.jpg"
+  },
+  "tile_07": {
+    "seed": 974215540,
+    "count": 2,
+    "prompt": "abstract album cover art, flowing translucent glass forms, electric cyan light glowing through, soft gradients, square composition, frosted liquid glass, soft refraction, subtle specular highlights, deep dark background, Apple-style minimal, soft studio light, no text, no letters, no logo",
+    "size": [
+      1024,
+      1024
+    ],
+    "batch_index": 1,
+    "file": "art/tile_07.jpg"
+  },
+  "tile_08": {
+    "seed": 1429644511,
+    "count": 2,
+    "prompt": "abstract album cover art, flowing translucent glass forms, azure blue light glowing through, soft gradients, square composition, frosted liquid glass, soft refraction, subtle specular highlights, deep dark background, Apple-style minimal, soft studio light, no text, no letters, no logo",
+    "size": [
+      1024,
+      1024
+    ],
+    "batch_index": 2,
+    "file": "art/tile_08.jpg"
+  },
+  "tile_09": {
+    "seed": 872477082,
+    "count": 2,
+    "prompt": "abstract album cover art, flowing translucent glass forms, indigo light glowing through, soft gradients, square composition, frosted liquid glass, soft refraction, subtle specular highlights, deep dark background, Apple-style minimal, soft studio light, no text, no letters, no logo",
+    "size": [
+      1024,
+      1024
+    ],
+    "batch_index": 1,
+    "file": "art/tile_09.jpg"
+  },
+  "tile_10": {
+    "seed": 1331265020,
+    "count": 2,
+    "prompt": "abstract album cover art, flowing translucent glass forms, violet light glowing through, soft gradients, square composition, frosted liquid glass, soft refraction, subtle specular highlights, deep dark background, Apple-style minimal, soft studio light, no text, no letters, no logo",
+    "size": [
+      1024,
+      1024
+    ],
+    "batch_index": 1,
+    "file": "art/tile_10.jpg"
+  },
+  "tile_11": {
+    "seed": 939204545,
+    "count": 2,
+    "prompt": "abstract album cover art, flowing translucent glass forms, magenta light glowing through, soft gradients, square composition, frosted liquid glass, soft refraction, subtle specular highlights, deep dark background, Apple-style minimal, soft studio light, no text, no letters, no logo",
+    "size": [
+      1024,
+      1024
+    ],
+    "batch_index": 1,
+    "file": "art/tile_11.jpg"
+  },
+  "tile_12": {
+    "seed": 1736107286,
+    "count": 2,
+    "prompt": "abstract album cover art, flowing translucent glass forms, dusty rose light glowing through, soft gradients, square composition, frosted liquid glass, soft refraction, subtle specular highlights, deep dark background, Apple-style minimal, soft studio light, no text, no letters, no logo",
+    "size": [
+      1024,
+      1024
+    ],
+    "batch_index": 2,
+    "file": "art/tile_12.jpg"
+  },
+  "icon_background": {
+    "seed": 1737553651,
+    "count": 3,
+    "prompt": "empty smooth gradient backdrop with no objects, warm coral orange glow in the top left corner fading into deep plum and midnight blue, fine velvety grain, frosted liquid glass, soft refraction, subtle specular highlights, deep dark background, Apple-style minimal, soft studio light, no text, no letters, no logo",
+    "size": [
+      1024,
+      1024
+    ],
+    "batch_index": 1,
+    "file": "icon/layers/background.png"
+  },
+  "icon_foreground": {
+    "seed": 160447426,
+    "count": 4,
+    "prompt": "front view of a rounded square tile of thick clear liquid glass with a rounded play triangle inside it, the triangle glowing warm coral orange, crisp white specular rim, centered, pure black background, product shot, frosted liquid glass, soft refraction, subtle specular highlights, deep dark background, Apple-style minimal, soft studio light, no text, no letters, no logo",
+    "size": [
+      1024,
+      1024
+    ],
+    "batch_index": 4,
+    "file": "icon/layers/foreground.png"
+  },
+  "ambient_4": {
+    "seed": 1691929247,
+    "count": 3,
+    "prompt": "gentle nebula of peach and plum haze, soft and out of focus, smooth dark moody background, no frames, no lines, frosted liquid glass, soft refraction, subtle specular highlights, deep dark background, Apple-style minimal, soft studio light, wide calm composition, low contrast, no text, no letters, no logo",
+    "size": [
+      1344,
+      768
+    ],
+    "batch_index": 2,
+    "file": "backgrounds/ambient_4.jpg"
+  },
+  "mockup_backdrop": {
+    "seed": 2070852497,
+    "count": 2,
+    "prompt": "empty studio backdrop with no objects, soft warm spotlight falling on a seamless dark gradient wall, frosted liquid glass, soft refraction, subtle specular highlights, deep dark background, Apple-style minimal, soft studio light, no text, no letters, no logo",
+    "size": [
+      1344,
+      768
+    ],
+    "batch_index": 2,
+    "file": "readme/mockup_backdrop.jpg"
+  }
+}

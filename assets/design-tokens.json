@@ -1,0 +1,109 @@
+{
+  "accent": "#FF6A3D",
+
+  "colors": {
+    "dark": {
+      "textPrimary": "#FFFFFFF2",
+      "textSecondary": "#FFFFFFB3",
+      "textTertiary": "#FFFFFF80",
+      "glassTint": "#1C1C2014",
+      "glassTintRegular": "#1A1A1E52",
+      "frost": "#2A2A2EF0",
+      "rim": "#FFFFFFB3",
+      "border": "#FFFFFF38",
+      "shadow": "#00000059",
+      "track": "#FFFFFF40",
+      "trackFill": "#FFFFFFE6",
+      "focusRing": "#FF6A3D",
+      "danger": "#FF453A",
+      "contentBackground": "#0B0B0E"
+    },
+    "light": {
+      "textPrimary": "#000000E6",
+      "textSecondary": "#0000009E",
+      "textTertiary": "#00000070",
+      "glassTint": "#FFFFFF1A",
+      "glassTintRegular": "#F5F5F77A",
+      "frost": "#ECECF0F2",
+      "rim": "#FFFFFFE6",
+      "border": "#FFFFFF59",
+      "shadow": "#00000040",
+      "track": "#0000002E",
+      "trackFill": "#000000CC",
+      "focusRing": "#E0542A",
+      "danger": "#E5352B",
+      "contentBackground": "#F2F2F5"
+    },
+    "increasedContrast": {
+      "textPrimary": "#FFFFFFFF",
+      "textSecondary": "#FFFFFFE6",
+      "textTertiary": "#FFFFFFCC",
+      "glassTint": "#000000A6",
+      "glassTintRegular": "#000000CC",
+      "frost": "#0A0A0AFA",
+      "rim": "#FFFFFFFF",
+      "border": "#FFFFFFB3",
+      "shadow": "#00000080",
+      "track": "#FFFFFF80",
+      "trackFill": "#FFFFFFFF",
+      "focusRing": "#FFB199",
+      "danger": "#FF6961",
+      "contentBackground": "#000000"
+    }
+  },
+
+  "spacing": { "xs": 4, "s": 8, "m": 12, "l": 16, "xl": 24 },
+
+  "radii": { "window": 8, "popover": 24, "toast": 22, "control": 22 },
+
+  "sizes": {
+    "dockHeight": 52,
+    "dockMaxWidth": 900,
+    "dockBottomMargin": 18,
+    "control": 40,
+    "primaryControl": 44,
+    "chromeHeight": 40,
+    "windowMin": [520, 300],
+    "windowDefault": [960, 540]
+  },
+
+  "glass": {
+    "regular": { "blur": 28, "saturation": 1.5, "lift": 0.06, "refraction": 10 },
+    "clear":   { "blur": 10, "saturation": 1.35, "lift": 0.03, "refraction": 12 },
+    "dimming": 0.35,
+    "dimOnLuminance": 0.58,
+    "dimOffLuminance": 0.44,
+    "luminanceSampleMs": 250,
+    "rimWidth": 1.0,
+    "rimHigh": 0.70,
+    "rimLow": 0.05,
+    "parallax": 3,
+    "shadowBlur": 40,
+    "shadowOpacity": 0.30,
+    "smoothUnion": 10,
+    "overlapOpacityBoost": 0.25
+  },
+
+  "springs": {
+    "smooth": { "response": 0.45, "dampingRatio": 1.0 },
+    "snappy": { "response": 0.35, "dampingRatio": 0.85 },
+    "bouncy": { "response": 0.50, "dampingRatio": 0.70 },
+    "follow": { "response": 0.12, "dampingRatio": 1.0 }
+  },
+
+  "timings": {
+    "fade": 200,
+    "fadeFast": 160,
+    "fadeSlow": 240,
+    "reducedMotionFade": 120,
+    "autoHide": 2500,
+    "clickDelay": 200,
+    "toastHold": 1300,
+    "volumeCollapse": 1500,
+    "contentDelay": 60,
+    "itemStagger": 15,
+    "geometrySaveDebounce": 400,
+    "trackCrossfade": 400,
+    "firstFrameFade": 250
+  }
+}

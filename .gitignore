@@ -1,0 +1,6 @@
+dist/
+libmpv-2.dll
+assets/_candidates/
+
+target/
+out.png

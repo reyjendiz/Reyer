@@ -83,7 +83,6 @@ pub struct DockState {
     volume_open: bool,
     volume_idle: Option<Instant>,
     volume_hover: bool,
-    shimmer_at: Option<Instant>,
     pulse_at: Option<Instant>,
     pub rect: Rect,
     pub tools_collapsed: bool,
@@ -114,7 +113,6 @@ impl DockState {
             volume_open: false,
             volume_idle: None,
             volume_hover: false,
-            shimmer_at: None,
             pulse_at: None,
             rect: Rect::ZERO,
             tools_collapsed: false,
@@ -149,12 +147,6 @@ impl DockState {
             self.speed_nudge.nudge(d * 160.0);
         }
         self.last_speed = speed;
-    }
-
-    fn press(&mut self, ui: &Ui) {
-        if !ui.th.reduce_motion {
-            self.shimmer_at = Some(ui.now);
-        }
     }
 
     pub fn draw(&mut self, ui: &mut Ui, inp: &DockInput) -> Vec<DockAction> {
@@ -244,20 +236,6 @@ impl DockState {
             ui.over_chrome = true;
         }
 
-        // shimmer sweeping across the glass when any control is pressed
-        let shimmer = match self.shimmer_at {
-            Some(s) => {
-                let k = now.duration_since(s).as_secs_f32() / 0.42;
-                if k >= 1.0 {
-                    self.shimmer_at = None;
-                    -1.0
-                } else {
-                    ui.animating = true;
-                    (1.0 - (1.0 - k).powi(3)) * 1.1
-                }
-            }
-            None => -1.0,
-        };
 
         // ---- glass: the transport capsule grows into one pill while the others sink into it ----------
         let sunk = |r: Rect| -> Rect {
@@ -290,7 +268,7 @@ impl DockState {
                 s.2 = g;
             }
         }
-        ui.glass(GlassSpec { role: Role::Dock, shapes, dim: inp.dim, shimmer, overlap: 0.0 });
+        ui.glass(GlassSpec { role: Role::Dock, shapes, dim: inp.dim, shimmer: -1.0, overlap: 0.0 });
 
         // hairline dividers between the groups inside the single pill
         if merge > 0.01 {
@@ -309,7 +287,6 @@ impl DockState {
         let play_r = Rect::new(ox + pad + 38.0, oy + pad, 44.0, 40.0);
         let next_r = Rect::new(ox + pad + 84.0, oy + pad, 36.0, 40.0);
         if ui.icon_button(idn(PREV), prev_r, "previous", 18.0, BtnStyle { label: "Previous", ..BtnStyle::default() }).clicked {
-            self.press(ui);
             acts.push(DockAction::Previous);
         }
         let playing = inp.has_media && !inp.paused;
@@ -331,12 +308,10 @@ impl DockState {
             }
         });
         if play.clicked {
-            self.press(ui);
             self.pulse_at = Some(now);
             acts.push(DockAction::TogglePause);
         }
         if ui.icon_button(idn(NEXT), next_r, "next", 18.0, BtnStyle { label: "Next", ..BtnStyle::default() }).clicked {
-            self.press(ui);
             acts.push(DockAction::Next);
         }
 
@@ -358,7 +333,6 @@ impl DockState {
             ui.r.icon(Icon::Speaker(speaker_state(waves[0]), speaker_state(waves[1]), speaker_state(waves[2])), r.center(), 20.0, c);
         });
         if mute.clicked {
-            self.press(ui);
             acts.push(DockAction::ToggleMute);
         }
         let vol_alpha = ((volume_w - height) / volume_slider).clamp(0.0, 1.0);
@@ -423,7 +397,6 @@ impl DockState {
         let num_r = Rect::new(spx + 32.0, oy + pad, 58.0, 40.0);
         let plus_r = Rect::new(spx + 90.0, oy + pad, 32.0, 40.0);
         if ui.text_button(idn(SLOWER), minus_r, "−", 17.0, BtnStyle { label: "Slower", ..BtnStyle::default() }).clicked {
-            self.press(ui);
             acts.push(DockAction::StepSpeed(-1));
         }
         let speed_label = crate::i18n::tr1("Playback speed {}. Click to reset, hold for presets", &format_speed(inp.speed));
@@ -447,14 +420,12 @@ impl DockState {
             ui.r.pop_clip();
         });
         if num.clicked {
-            self.press(ui);
             acts.push(DockAction::ResetSpeed);
         }
         if num.long_pressed || num.right_clicked {
             acts.push(DockAction::SpeedPresets);
         }
         if ui.text_button(idn(FASTER), plus_r, "+", 17.0, BtnStyle { label: "Faster", ..BtnStyle::default() }).clicked {
-            self.press(ui);
             acts.push(DockAction::StepSpeed(1));
         }
 
@@ -469,24 +440,19 @@ impl DockState {
             let bx = |i: f32| tg.x + pad + 36.0 * i;
             let st = |label| BtnStyle { label, enabled: on, ..BtnStyle::default() };
             if ui.icon_button(idn(AUDIO), Rect::new(bx(0.0), by, 36.0, 36.0), "audio", 18.0, BtnStyle { label: "Audio track", enabled: on && inp.has_audio_tracks, ..BtnStyle::default() }).clicked {
-                self.press(ui);
                 acts.push(DockAction::Popover("audio"));
             }
             if ui.icon_button(idn(SUBTITLES), Rect::new(bx(1.0), by, 36.0, 36.0), "subtitles", 18.0, BtnStyle { active: inp.subtitle_active, ..st("Subtitles") }).clicked {
-                self.press(ui);
                 acts.push(DockAction::Popover("subtitles"));
             }
             if ui.icon_button(idn(SETTINGS), Rect::new(bx(2.0), by, 36.0, 36.0), "settings", 18.0, st("Settings")).clicked {
-                self.press(ui);
                 acts.push(DockAction::Popover("settings"));
             }
             if ui.icon_button(idn(OPEN), Rect::new(bx(3.0), by, 36.0, 36.0), "open", 18.0, st("Open")).clicked {
-                self.press(ui);
                 acts.push(DockAction::Open);
             }
             let (icon, label) = if inp.fullscreen { ("exitFullscreen", "Exit full screen") } else { ("fullscreen", "Full screen") };
             if ui.icon_button(idn(FULLSCREEN), Rect::new(bx(4.0), by, 36.0, 36.0), icon, 18.0, st(label)).clicked {
-                self.press(ui);
                 acts.push(DockAction::Fullscreen);
             }
             ui.r.pop();
@@ -495,7 +461,6 @@ impl DockState {
             ui.r.push_alpha(1.0 - row_a);
             let on = self.tools_collapsed;
             if ui.icon_button(idn(MORE), Rect::new(tg.x + pad, oy + pad, 40.0, 40.0), "more", 18.0, BtnStyle { label: "More", enabled: on, ..BtnStyle::default() }).clicked {
-                self.press(ui);
                 acts.push(DockAction::Popover("tools"));
             }
             ui.r.pop();

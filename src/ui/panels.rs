@@ -112,10 +112,6 @@ impl PanelState {
                 acts.push(PanelAction::Applied(key, *value));
                 acts.push(PanelAction::Changed);
             }
-            if r.hover > 0.0 {
-                let base = if ui.th.light { [0.0, 0.0, 0.0, 0.05 * r.hover] } else { [1.0, 1.0, 1.0, 0.07 * r.hover] };
-                ui.r.rrect(rect.inset(-4.0), 10.0, base);
-            }
             let mut ty = rect.y + (h - texts_h) / 2.0;
             for line in &label_lines {
                 ui.r.text(line, x, ty, 13.0, Weight::Medium, text);

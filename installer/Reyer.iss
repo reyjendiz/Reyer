@@ -90,6 +90,20 @@ begin
   end;
 end;
 
+// the Quick Look agent runs in the background and would keep Reyer.exe locked
+procedure StopReyer;
+var
+  Code: Integer;
+begin
+  Exec(ExpandConstant('{sys}\taskkill.exe'), '/F /IM Reyer.exe', '', SW_HIDE, ewWaitUntilTerminated, Code);
+end;
+
+function PrepareToInstall(var NeedsRestart: Boolean): String;
+begin
+  StopReyer;
+  Result := '';
+end;
+
 procedure CurStepChanged(CurStep: TSetupStep);
 begin
   if (CurStep = ssPostInstall) and WizardIsTaskSelected('assoc') then
@@ -108,6 +122,8 @@ procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
 begin
   if CurUninstallStep = usUninstall then
   begin
+    StopReyer;
+    RegDeleteValue(HKCU, 'Software\Microsoft\Windows\CurrentVersion\Run', 'Reyer Quick Look');
     ForEachExt(VideoExts, 'Reyer.Video', True);
     ForEachExt(AudioExts, 'Reyer.Audio', True);
     RegDeleteKeyIncludingSubkeys(HKA, 'Software\Classes\Reyer.Video');

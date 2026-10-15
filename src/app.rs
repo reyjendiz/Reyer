@@ -44,6 +44,8 @@ pub struct Cli {
     pub shot: Option<String>,
     pub shot_after_ms: u64,
     pub window_rect: Option<[i32; 4]>,
+    /// Quick Look preview: no window focus, nothing saved, no updates or agent.
+    pub preview: bool,
     /// (ms, kind, argument): scripted input
     pub script: Vec<(u64, String, String)>,
 }
@@ -55,6 +57,10 @@ impl Cli {
         while let Some(a) = args.next() {
             match a.as_str() {
                 "--shot" => cli.shot = args.next(),
+                "--preview" => {
+                    cli.preview = true;
+                    crate::settings::PREVIEW.store(true, std::sync::atomic::Ordering::Relaxed);
+                }
                 // "800:click:700,560;1500:key:escape" - scripted input for screenshots and checks
                 "--script" => {
                     cli.script = args.next().unwrap_or_default().split(';').filter_map(|step| {
@@ -263,8 +269,11 @@ impl App {
         }
         self.started = true;
         let _ = self.player.start(&self.settings, self.display, self.get_proc);
-        if self.settings.check_updates {
-            self.updater.check();
+        if !self.cli.preview {
+            if self.settings.check_updates {
+                self.updater.check();
+            }
+            crate::quicklook::ensure(self.settings.quick_look);
         }
         if !self.cli.files.is_empty() {
             self.player.open_paths(&self.cli.files, &mut self.settings);
@@ -1024,6 +1033,7 @@ impl App {
                 PanelAction::UpdateRequested => self.updater.install(),
                 PanelAction::Changed => {
                     crate::i18n::set(&self.settings.language);
+                    crate::quicklook::ensure(self.settings.quick_look);
                     self.theme = Theme::new(&self.settings, &self.sys_prefs, self.theme.light_dir);
                     let _ = self.settings.save(&self.settings_path);
                 }

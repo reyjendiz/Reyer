@@ -114,6 +114,8 @@ const TABLE: &[(&str, &str, &str)] = &[
     ("Continues with the next file when one ends", "После окончания включает следующий файл", "Після закінчення вмикає наступний файл"),
     ("Generate Artwork for Tracks Without Cover", "Генерировать обложки для треков без обложки", "Генерувати обкладинки для треків без обкладинки"),
     ("Uses the local ComfyUI studio if it's installed", "Использует локальную студию ComfyUI, если она установлена", "Використовує локальну студію ComfyUI, якщо її встановлено"),
+    ("Quick Look in Explorer", "Быстрый просмотр в Проводнике", "Швидкий перегляд у Провіднику"),
+    ("Hold Space on a video or audio file in Explorer or on the desktop to preview it", "Удерживайте пробел на видео или аудио в Проводнике или на рабочем столе, чтобы посмотреть его", "Утримуйте пробіл на відео чи аудіо у Провіднику або на робочому столі, щоб переглянути його"),
     ("Check for Updates", "Проверять обновления", "Перевіряти оновлення"),
     ("Looks for a new version on GitHub at startup", "Ищет новую версию на GitHub при запуске", "Шукає нову версію на GitHub під час запуску"),
     ("Accent", "Акцент", "Акцент"),

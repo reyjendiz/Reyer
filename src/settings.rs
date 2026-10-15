@@ -6,6 +6,9 @@ use std::path::{Path, PathBuf};
 
 pub const MAX_RESUME_ENTRIES: usize = 300;
 
+/// Set for a Quick Look preview window (`--preview`).
+pub static PREVIEW: std::sync::atomic::AtomicBool = std::sync::atomic::AtomicBool::new(false);
+
 #[derive(Serialize, Deserialize, Clone, PartialEq, Debug)]
 #[serde(default)]
 pub struct Settings {
@@ -39,6 +42,8 @@ pub struct Settings {
     pub last_folder: String,
     pub generate_artwork: bool,
     pub check_updates: bool,
+    /// Hold Space on a media file in Explorer to preview it.
+    pub quick_look: bool,
 }
 
 impl Default for Settings {
@@ -65,6 +70,7 @@ impl Default for Settings {
             last_folder: String::new(),
             generate_artwork: false,
             check_updates: true,
+            quick_look: true,
         }
     }
 }
@@ -103,10 +109,14 @@ impl Settings {
             last_folder: field(&raw, "last_folder", d.last_folder),
             generate_artwork: field(&raw, "generate_artwork", d.generate_artwork),
             check_updates: field(&raw, "check_updates", d.check_updates),
+            quick_look: field(&raw, "quick_look", d.quick_look),
         }
     }
 
     pub fn save(&mut self, path: &Path) -> std::io::Result<()> {
+        if PREVIEW.load(std::sync::atomic::Ordering::Relaxed) {
+            return Ok(()); // a Quick Look preview never changes settings, window memory or resume positions
+        }
         if self.resume_positions.len() > MAX_RESUME_ENTRIES {
             let skip = self.resume_positions.len() - MAX_RESUME_ENTRIES;
             self.resume_positions = self.resume_positions.drain(..).skip(skip).collect();

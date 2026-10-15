@@ -53,7 +53,8 @@ impl PanelState {
         let area = body.inset(t.spacing.l);
         self.scroll(ui, area);
         ui.r.push_clip(area);
-        let (x, w) = (area.x, area.w);
+        // inset so row highlights and hover-lifted switches stay clear of the popover edge
+        let (x, w) = (area.x + 8.0, area.w - 16.0);
         let mut y = area.y - self.scroll;
         let top = y;
         let text = ui.th.c.text_primary.0;
@@ -163,6 +164,7 @@ impl PanelState {
         toggle(ui, "resume_playback", "Resume Where I Left Off", "", &mut s.resume_playback, &mut y, &mut acts);
         toggle(ui, "loop_file", "Loop", "Repeats the current video or track", &mut s.loop_file, &mut y, &mut acts);
         toggle(ui, "autoplay_next", "Play Next File in Folder", "Continues with the next file when one ends", &mut s.autoplay_next, &mut y, &mut acts);
+        toggle(ui, "quick_look", "Quick Look in Explorer", "Hold Space on a video or audio file in Explorer or on the desktop to preview it", &mut s.quick_look, &mut y, &mut acts);
         toggle(ui, "check_updates", "Check for Updates", "Looks for a new version on GitHub at startup", &mut s.check_updates, &mut y, &mut acts);
         toggle(ui, "generate_artwork", "Generate Artwork for Tracks Without Cover", "Uses the local ComfyUI studio if it's installed", &mut s.generate_artwork, &mut y, &mut acts);
 

@@ -12,6 +12,7 @@ mod media;
 mod mpv;
 mod player;
 mod playlist;
+mod quicklook;
 mod settings;
 mod shell;
 mod speed;
@@ -34,6 +35,10 @@ fn install_panic_log() {
 fn main() {
     install_panic_log();
     win::set_app_id();
+    if std::env::args().any(|a| a == "--quicklook-agent") {
+        quicklook::run_agent();
+        return;
+    }
     let code = shell::run(app::Cli::parse());
     std::process::exit(code);
 }

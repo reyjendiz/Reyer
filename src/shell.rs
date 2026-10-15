@@ -128,7 +128,9 @@ impl Shell {
             .with_decorations(false)
             .with_undecorated_shadow(true)
             .with_visible(false)
-            .with_window_icon(crate::icon::window_icon());
+            .with_window_icon(crate::icon::window_icon())
+            // a Quick Look preview must not take the keyboard from Explorer: Space is still held there
+            .with_active(!self.cli.preview);
         let template = ConfigTemplateBuilder::new().with_alpha_size(0);
         let (window, config) = DisplayBuilder::new()
             .with_window_attributes(Some(attrs))
@@ -154,6 +156,9 @@ impl Shell {
         let gfx = Gfx::new(gl, (size.width as i32, size.height as i32), dpi)?;
         win::set_rounded(hwnd, true);
         win::install_resize_edges(hwnd);
+        if self.cli.preview {
+            win::set_topmost(hwnd, true);
+        }
         let display = Box::new(display);
         let state = WinState {
             size: gfx.logical(),
@@ -243,7 +248,9 @@ impl Running {
         if !self.first_frame_done {
             self.first_frame_done = true;
             self.window.set_visible(true);
-            self.window.focus_window();
+            if !crate::settings::PREVIEW.load(std::sync::atomic::Ordering::Relaxed) {
+                self.window.focus_window();
+            }
             self.app.first_frame_presented();
         }
         self.animating = out.animating;
